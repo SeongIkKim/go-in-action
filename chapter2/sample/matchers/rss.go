@@ -61,6 +61,7 @@ type (
 type rssMatcher struct{}
 
 // init 함수를 통해 프로그램에 검색기를 등록한다.
+// search/default.go의 init과 동일한 동작이다.
 func init() {
 	var matcher rssMatcher
 	search.Register("rss", matcher)
@@ -68,7 +69,7 @@ func init() {
 
 // Search 함수는 지정된 문서에서 검색어를 검색한다.
 func (m rssMatcher) Search(feed *search.Feed, searchTerm string) ([]*search.Result, error) {
-	var results []*search.Result
+	var results []*search.Result // 검색결과를 저장할 슬라이스 포인터
 
 	log.Printf("피드 종류[%s] 사이트[%s] 주소[%s]에서 검색을 수행합니다.\n", feed.Type, feed.Name, feed.URI)
 
