@@ -12,6 +12,7 @@ type Result struct {
 
 // Matcher 인터페이스는 새로운 검색 타입을 구현할 때
 // 필요한 동작을 정의한다.
+// 인터페이스가 하나의 메서드만을 정의하고 있다면 네이밍은 er로 끝나는 것이 컨벤션이다.
 type Matcher interface {
 	Search(feed *Feed, searchTerm string) ([]*Result, error)
 }
@@ -36,7 +37,7 @@ func Match(matcher Matcher, feed *Feed, searchTerm string, results chan<- *Resul
 // 검색 결과를 콘솔 창에 출력한다.
 func Display(results chan *Result) {
 	// 채널은 검색 결과가 기록될 때까지 접근이 차단된다.
-	// 채널이 닫히면 for 루프가 종료된다.
+	// search.go에서 close(results)로 채널이 닫히면 for 루프가 종료된다.(무한루프 아님)
 	for result := range results {
 		log.Printf("%s:\n%s\n\n", result.Field, result.Content)
 	}
