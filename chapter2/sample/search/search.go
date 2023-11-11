@@ -1,7 +1,7 @@
 package search
 
 import (
-    "log"
+	"log"
 	"sync"
 )
 
@@ -42,8 +42,12 @@ func Run(searchTerm string) {
 
 		// 검색을 실행하기 위해 고루틴을 실행힌다.
 		// go 예약어는 고루틴을 실행시키는데 사용한다.
+		// 익명 함수를 고루틴으로 실행시키는데, 이 때 함수의 인자로 matcher와 feed를 넘겨준다.
+		// matcher와 feed도 클로저로 전달할 수 있지만, 바깥쪽 loop에서 변경되는 변수이므로 goroutine이 실행되는 동안 클로저로 접근시 변수의 값이 변경되어버릴수 있다.
+		// 따라서 명시적으로 인자로 넘겨 복사본만을 전달한다.
 		go func(matcher Matcher, feed *Feed) {
 			Match(matcher, feed, searchTerm, results)
+			// waitGroup은 익명함수에 전달된 적이 없지만, 클로저로서 함수 내부에서 변수 원본에 직접 접근할 수 있다.
 			waitGroup.Done() // 세마포어 카운트를 줄인다.
 		}(matcher, feed)
 	}
@@ -51,6 +55,7 @@ func Run(searchTerm string) {
 	// 모든 작업이 완료되었는지를 모니터링할 고루틴을 실행한다.
 	go func() {
 		// 모든 작업이 처리될 때까지 기다린다.
+		// WaitGroup의 카운트가 0이 될 때까지 대기한다.
 		waitGroup.Wait()
 
 		// Display 함수에게 프로그램을 종료할 수 있음을
